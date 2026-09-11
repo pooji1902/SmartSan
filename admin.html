@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SmartSan - Admin Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <header class="dashboard-header">
+        <div>
+            <h1>📊 SmartSan Admin Dashboard</h1>
+            <p>Sanitation monitoring and analytics</p>
+        </div>
+
+        <button onclick="loadDashboard()" class="refresh-btn">
+            🔄 Refresh
+        </button>
+    </header>
+
+
+    <!-- STATISTICS -->
+
+    <div class="stats-container">
+
+        <div class="stat-card">
+            <h3>Total Complaints</h3>
+            <div id="total">0</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Pending</h3>
+            <div id="pending">0</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>In Progress</h3>
+            <div id="progress">0</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Resolved</h3>
+            <div id="resolved">0</div>
+        </div>
+
+    </div>
+
+
+    <!-- LOCATION ANALYSIS -->
+
+    <div class="reports-section">
+
+        <h2>📍 Location-wise Complaints</h2>
+
+        <div id="locationData">
+            Loading...
+        </div>
+
+    </div>
+
+
+    <!-- ISSUE ANALYSIS -->
+
+    <div class="reports-section">
+
+        <h2>⚠️ Issue-wise Complaints</h2>
+
+        <div id="issueData">
+            Loading...
+        </div>
+
+    </div>
+
+
+    <!-- RECENT COMPLAINTS -->
+
+    <div class="reports-section">
+
+        <h2>📋 Recent Complaints</h2>
+
+        <div id="recentData">
+            Loading...
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API = "http://127.0.0.1:5000";
+
+
+// ==============================
+// LOAD DASHBOARD
+// ==============================
+
+async function loadDashboard() {
+
+    try {
+
+        const response =
+            await fetch(API + "/api/complaints");
+
+        const complaints =
+            await response.json();
+
+        console.log("Admin Data:", complaints);
+
+
+        updateStatistics(complaints);
+
+        updateLocationData(complaints);
+
+        updateIssueData(complaints);
+
+        updateRecentComplaints(complaints);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Could not connect to SmartSan backend."
+        );
+
+    }
+
+}
+
+
+// ==============================
+// STATISTICS
+// ==============================
+
+function updateStatistics(complaints) {
+
+    let pending = 0;
+    let progress = 0;
+    let resolved = 0;
+
+
+    complaints.forEach(function(c) {
+
+        if (c.status === "Pending") {
+            pending++;
+        }
+
+        if (c.status === "In Progress") {
+            progress++;
+        }
+
+        if (c.status === "Resolved") {
+            resolved++;
+        }
+
+    });
+
+
+    document.getElementById("total")
+        .textContent = complaints.length;
+
+    document.getElementById("pending")
+        .textContent = pending;
+
+    document.getElementById("progress")
+        .textContent = progress;
+
+    document.getElementById("resolved")
+        .textContent = resolved;
+
+}
+
+
+// ==============================
+// LOCATION DATA
+// ==============================
+
+function updateLocationData(complaints) {
+
+    const locations = {};
+
+
+    complaints.forEach(function(c) {
+
+        const name = c.location_name;
+
+        if (!locations[name]) {
+            locations[name] = 0;
+        }
+
+        locations[name]++;
+
+    });
+
+
+    let html = "";
+
+
+    for (const location in locations) {
+
+        html += `
+            <div class="report-row">
+
+                <div>
+                    <strong>
+                        📍 ${location}
+                    </strong>
+                </div>
+
+                <div>
+                    <strong>
+                        ${locations[location]} complaints
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    document.getElementById("locationData")
+        .innerHTML =
+        html || "<p>No data available</p>";
+
+}
+
+
+// ==============================
+// ISSUE DATA
+// ==============================
+
+function updateIssueData(complaints) {
+
+    const issues = {};
+
+
+    complaints.forEach(function(c) {
+
+        const issue = c.issue_type;
+
+        if (!issues[issue]) {
+            issues[issue] = 0;
+        }
+
+        issues[issue]++;
+
+    });
+
+
+    let html = "";
+
+
+    for (const issue in issues) {
+
+        html += `
+            <div class="report-row">
+
+                <div>
+                    <strong>
+                        ⚠️ ${issue}
+                    </strong>
+                </div>
+
+                <div>
+                    <strong>
+                        ${issues[issue]} reports
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    document.getElementById("issueData")
+        .innerHTML =
+        html || "<p>No data available</p>";
+
+}
+
+
+// ==============================
+// RECENT COMPLAINTS
+// ==============================
+
+function updateRecentComplaints(complaints) {
+
+    const recent =
+        complaints.slice(0, 5);
+
+
+    let html = "";
+
+
+    recent.forEach(function(c) {
+
+        html += `
+
+            <div class="report-row">
+
+                <div>
+
+                    <h3>
+                        Complaint #${c.complaint_id}
+                    </h3>
+
+                    <p>
+                        📍 ${c.location_name}
+                    </p>
+
+                    <p>
+                        ⚠️ ${c.issue_type}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <span class="status
+                    ${
+                        c.status === "Resolved"
+                        ? "resolved"
+                        : c.status === "In Progress"
+                        ? "progress"
+                        : "pending"
+                    }">
+
+                        ${c.status}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+
+    document.getElementById("recentData")
+        .innerHTML =
+        html || "<p>No complaints available</p>";
+
+}
+
+
+// ==============================
+// LOAD ON PAGE OPEN
+// ==============================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadDashboard
+);
+
+</script>
+
+</body>
+</html>
