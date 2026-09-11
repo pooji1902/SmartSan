@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SmartSan - Staff Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <header class="dashboard-header">
+            <div>
+                <h1>🧹 SmartSan Staff Dashboard</h1>
+                <p>Manage sanitation complaints and cleaning tasks</p>
+            </div>
+
+            <button onclick="loadComplaints()" class="refresh-btn">
+                🔄 Refresh
+            </button>
+        </header>
+
+
+        <div class="stats-container">
+
+            <div class="stat-card">
+                <h3>Pending</h3>
+                <div id="pendingCount">0</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>In Progress</h3>
+                <div id="progressCount">0</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Resolved</h3>
+                <div id="resolvedCount">0</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total</h3>
+                <div id="totalCount">0</div>
+            </div>
+
+        </div>
+
+
+        <div class="reports-section">
+
+            <h2>📋 Complaints</h2>
+
+            <div id="reportsContainer">
+
+                <p>Loading complaints...</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+
+        // ==============================
+        // LOAD COMPLAINTS
+        // ==============================
+
+        async function loadComplaints() {
+
+            const container =
+                document.getElementById("reportsContainer");
+
+            container.innerHTML =
+                "<p>Loading complaints...</p>";
+
+            try {
+
+                const response =
+                    await fetch(API_URL + "/api/complaints");
+
+                const complaints =
+                    await response.json();
+
+                console.log("Complaints:", complaints);
+
+                displayComplaints(complaints);
+
+                updateStats(complaints);
+
+            } catch (error) {
+
+                console.error(error);
+
+                container.innerHTML = `
+                    <p style="color:red;">
+                        ❌ Could not connect to SmartSan backend.
+                    </p>
+                `;
+            }
+        }
+
+
+        // ==============================
+        // DISPLAY COMPLAINTS
+        // ==============================
+
+        function displayComplaints(complaints) {
+
+            const container =
+                document.getElementById("reportsContainer");
+
+            if (!complaints || complaints.length === 0) {
+
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <h3>🎉 No complaints</h3>
+                        <p>All sanitation areas are clean.</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            container.innerHTML = "";
+
+
+            complaints.forEach(function (complaint) {
+
+                let statusClass = "pending";
+
+                if (complaint.status === "In Progress") {
+                    statusClass = "progress";
+                }
+
+                if (complaint.status === "Resolved") {
+                    statusClass = "resolved";
+                }
+
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "report-row";
+
+
+                card.innerHTML = `
+
+                    <div class="report-info">
+
+                        <h3>
+                            Complaint #${complaint.complaint_id}
+                        </h3>
+
+                        <p>
+                            📍 <strong>Location:</strong>
+                            ${complaint.location_name}
+                        </p>
+
+                        <p>
+                            ⚠️ <strong>Issue:</strong>
+                            ${complaint.issue_type}
+                        </p>
+
+                        <p>
+                            📱 <strong>Source:</strong>
+                            ${complaint.source}
+                        </p>
+
+                        <p>
+                            📝 <strong>Details:</strong>
+                            ${complaint.details || "No details"}
+                        </p>
+
+                        <p>
+                            🕒 <strong>Reported:</strong>
+                            ${formatDate(complaint.reported_at)}
+                        </p>
+
+                    </div>
+
+
+                    <div class="report-action">
+
+                        <span class="status ${statusClass}">
+                            ${complaint.status}
+                        </span>
+
+
+                        ${
+                            complaint.status === "Pending"
+                            ?
+                            `<button
+                                onclick="changeStatus(
+                                    ${complaint.complaint_id},
+                                    'In Progress'
+                                )">
+                                Start Cleaning
+                            </button>`
+                            :
+                            ""
+                        }
+
+
+                        ${
+                            complaint.status === "In Progress"
+                            ?
+                            `<button
+                                onclick="changeStatus(
+                                    ${complaint.complaint_id},
+                                    'Resolved'
+                                )">
+                                Complete ✓
+                            </button>`
+                            :
+                            ""
+                        }
+
+
+                        ${
+                            complaint.status === "Resolved"
+                            ?
+                            `<button disabled>
+                                Completed ✓
+                            </button>`
+                            :
+                            ""
+                        }
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(card);
+
+            });
+
+        }
+
+
+        // ==============================
+        // UPDATE STATUS
+        // ==============================
+
+        async function changeStatus(
+            complaintId,
+            newStatus
+        ) {
+
+            try {
+
+                const response = await fetch(
+                    API_URL +
+                    "/api/complaints/" +
+                    complaintId +
+                    "/status",
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            status: newStatus
+                        })
+                    }
+                );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(result);
+
+
+                if (response.ok) {
+
+                    alert(
+                        "Complaint #" +
+                        complaintId +
+                        " updated to " +
+                        newStatus +
+                        " ✅"
+                    );
+
+                    loadComplaints();
+
+                } else {
+
+                    alert(
+                        "Error: " +
+                        result.message
+                    );
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Could not connect to backend."
+                );
+            }
+
+        }
+
+
+        // ==============================
+        // UPDATE STATISTICS
+        // ==============================
+
+        function updateStats(complaints) {
+
+            let pending = 0;
+            let progress = 0;
+            let resolved = 0;
+
+
+            complaints.forEach(function (complaint) {
+
+                if (complaint.status === "Pending") {
+                    pending++;
+                }
+
+                else if (
+                    complaint.status === "In Progress"
+                ) {
+                    progress++;
+                }
+
+                else if (
+                    complaint.status === "Resolved"
+                ) {
+                    resolved++;
+                }
+
+            });
+
+
+            document.getElementById(
+                "pendingCount"
+            ).textContent = pending;
+
+
+            document.getElementById(
+                "progressCount"
+            ).textContent = progress;
+
+
+            document.getElementById(
+                "resolvedCount"
+            ).textContent = resolved;
+
+
+            document.getElementById(
+                "totalCount"
+            ).textContent = complaints.length;
+
+        }
+
+
+        // ==============================
+        // DATE FORMAT
+        // ==============================
+
+        function formatDate(dateString) {
+
+            if (!dateString) {
+                return "N/A";
+            }
+
+            return new Date(dateString)
+                .toLocaleString();
+
+        }
+
+
+        // ==============================
+        // LOAD WHEN PAGE OPENS
+        // ==============================
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            loadComplaints
+        );
+
+    </script>
+
+</body>
+</html>

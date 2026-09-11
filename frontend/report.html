@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Report Issue | SmartSan</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="logo">
+            🧼 SmartSan
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="report.html">Report Issue</a>
+            <a href="staff.html">Staff</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+
+    </header>
+
+
+    <!-- REPORT SECTION -->
+    <section class="report-section">
+
+        <div class="report-container">
+
+            <!-- LEFT SIDE -->
+            <div class="report-info">
+
+                <span class="small-title">
+                    SMART REPORTING
+                </span>
+
+                <h1>
+                    Report a<br>
+                    <span>Sanitation Issue.</span>
+                </h1>
+
+                <p>
+                    Found a sanitation problem?
+                    Tell us about it and our cleaning staff
+                    will be notified immediately.
+                </p>
+
+                <div class="report-features">
+
+                    <div>
+                        <span>⚡</span>
+                        <strong>Quick Reporting</strong>
+                    </div>
+
+                    <div>
+                        <span>🔔</span>
+                        <strong>Instant Staff Alert</strong>
+                    </div>
+
+                    <div>
+                        <span>📊</span>
+                        <strong>Issue Tracking</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- REPORT FORM -->
+            <div class="report-card">
+
+                <h2>Report an Issue</h2>
+
+                <p class="form-subtitle">
+                    Please provide the issue details.
+                </p>
+
+
+                <!-- LOCATION -->
+                <label for="location">
+                    Location
+                </label>
+
+                <select id="location">
+
+                    <option value="">
+                        Select Location
+                    </option>
+
+                    <option value="1">
+                        Girls Toilet - Ground Floor
+                    </option>
+
+                    <option value="2">
+                        Girls Toilet - First Floor
+                    </option>
+
+                    <option value="3">
+                        Boys Toilet - Ground Floor
+                    </option>
+
+                    <option value="4">
+                        Boys Toilet - First Floor
+                    </option>
+
+                    <option value="5">
+                        Canteen
+                    </option>
+
+                    <option value="6">
+                        College Campus
+                    </option>
+
+                </select>
+
+
+                <!-- ISSUE TYPE -->
+                <label>
+                    What's the problem?
+                </label>
+
+                <div class="issue-grid">
+
+                    <button
+                        type="button"
+                        class="issue-btn"
+                        data-issue="Toilet Dirty">
+
+                        🚽
+                        <span>Toilet Dirty</span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="issue-btn"
+                        data-issue="Water Leakage">
+
+                        💧
+                        <span>Water Leakage</span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="issue-btn"
+                        data-issue="Soap Finished">
+
+                        🧴
+                        <span>Soap Finished</span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="issue-btn"
+                        data-issue="Tissue Finished">
+
+                        🧻
+                        <span>Tissue Finished</span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="issue-btn"
+                        data-issue="Dustbin Full">
+
+                        🗑️
+                        <span>Dustbin Full</span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="issue-btn"
+                        data-issue="Bad Smell">
+
+                        🦠
+                        <span>Bad Smell</span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+                <label for="description">
+                    Additional Details
+                </label>
+
+                <textarea
+                    id="description"
+                    placeholder="Describe the problem (optional)..."
+                    rows="4"></textarea>
+
+
+                <!-- SUBMIT -->
+                <button
+                    type="button"
+                    class="submit-report"
+                    onclick="submitReport()">
+
+                    Submit Report 🚀
+
+                </button>
+
+
+                <p class="privacy-note">
+                    🔒 Your report helps us maintain a cleaner campus.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <h3>🧼 SmartSan</h3>
+
+        <p>
+            Smart technology for cleaner and healthier spaces.
+        </p>
+
+        <p class="copyright">
+            © 2026 SmartSan. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>
